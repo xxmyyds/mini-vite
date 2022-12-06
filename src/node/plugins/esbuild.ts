@@ -27,9 +27,6 @@ export function esbuildTransformPlugin(): Plugin {
           sourcemap: true,
           loader: extname as 'js' | 'ts' | 'jsx' | 'tsx',
         })
-        if (extname === 'tsx') {
-          console.log(transformedCode)
-        }
 
         return {
           code: transformedCode,
