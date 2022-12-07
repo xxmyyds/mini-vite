@@ -3,6 +3,7 @@
 import connect from 'connect'
 // picocolors 是一个用来在命令行显示不同颜色文本的工具
 import { blue, green } from 'picocolors'
+import chokidar, { FSWatcher } from 'chokidar'
 import { optimize } from '../optimizer/index'
 import { resolvePlugins } from '../plugins'
 import { Plugin } from '../plugin'
@@ -10,12 +11,19 @@ import { createPluginContainer, PluginContainer } from '../pluginContainer'
 import { indexHtmlMiddware } from './middlewares/indexHtml'
 import { transformMiddleware } from './middlewares/transform'
 import { staticMiddleware } from './middlewares/static'
+import { ModuleGraph } from '../ModuleGraph'
+import { bindingHMREvents } from '../hmr'
+import { normalizePath } from '../utils'
+import { createWebSocketServer } from '../ws'
 
 export interface ServerContext {
   root: string
   pluginContainer: PluginContainer
   app: connect.Server
   plugins: Plugin[]
+  moduleGraph: ModuleGraph
+  ws: { send: (data: any) => void; close: () => void }
+  watcher: FSWatcher
 }
 
 export async function startDevServer() {
@@ -24,13 +32,24 @@ export async function startDevServer() {
   const startTime = Date.now()
   const plugins = resolvePlugins()
   const pluginContainer = createPluginContainer(plugins)
+  const moduleGraph = new ModuleGraph((url) => pluginContainer.resolveId(url))
+  const watcher = chokidar.watch(root, {
+    ignored: ['**/node_modules/**', '**/.git/**'],
+    ignoreInitial: true,
+  })
+  const ws = createWebSocketServer(app)
 
   const serverContext: ServerContext = {
     root: process.cwd(),
     app,
     pluginContainer,
     plugins,
+    moduleGraph,
+    ws,
+    watcher,
   }
+
+  bindingHMREvents(serverContext)
 
   for (const plugin of plugins) {
     if (plugin.configureServer) {
