@@ -11,7 +11,6 @@ export function scanPlugin(deps: Set<string>): Plugin {
         (resolveInfo) => {
           return {
             path: resolveInfo.path,
-            // 打上 external 标记
             external: true,
           }
         }
@@ -23,7 +22,6 @@ export function scanPlugin(deps: Set<string>): Plugin {
         },
         (resolveInfo) => {
           const { path: id } = resolveInfo
-          // 推入 deps 集合中
           deps.add(id)
           return {
             path: id,
