@@ -3,6 +3,7 @@ import { CLIENT_PUBLIC_PATH } from '../constants'
 import { Plugin } from '../plugin'
 import { ServerContext } from '../server'
 import { getShortName } from '../utils'
+import { blue, green, yellow } from 'picocolors'
 
 export function cssPlugin(): Plugin {
   let serverContext: ServerContext
@@ -12,6 +13,8 @@ export function cssPlugin(): Plugin {
       serverContext = s
     },
     load(id) {
+      //   console.log(blue('css load'), id)
+
       // 加载
       if (id.endsWith('.css')) {
         return readFile(id, 'utf-8')
@@ -19,6 +22,8 @@ export function cssPlugin(): Plugin {
     },
     // 转换逻辑
     async transform(code, id) {
+      //   console.log(yellow('css transform'), id)
+
       if (id.endsWith('.css')) {
         // 包装成 JS 模块
         const jsContent = `

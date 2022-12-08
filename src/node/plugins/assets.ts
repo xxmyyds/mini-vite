@@ -7,6 +7,7 @@ import {
   normalizePath,
   removeImportQuery,
 } from '../utils'
+import { blue, green, yellow } from 'picocolors'
 
 export function assetPlugin(): Plugin {
   let serverContext: ServerContext
@@ -17,6 +18,8 @@ export function assetPlugin(): Plugin {
       serverContext = s
     },
     async load(id) {
+      console.log(blue('assets load'), id)
+
       const cleanedId = removeImportQuery(cleanUrl(id))
       const resolvedId = `/${getShortName(
         normalizePath(id),

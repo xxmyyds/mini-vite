@@ -16,6 +16,7 @@ import MagicString from 'magic-string'
 import path from 'path'
 import { Plugin } from '../plugin'
 import { ServerContext } from '../server/index'
+import { blue, green, yellow } from 'picocolors'
 
 export function importAnalysisPlugin(): Plugin {
   let serverContext: ServerContext
@@ -26,6 +27,8 @@ export function importAnalysisPlugin(): Plugin {
       serverContext = s
     },
     async transform(code: string, id: string) {
+      // console.log(yellow('importAnalysis transform'), id)
+
       // 只处理 JS 相关的请求
       if (!isJSRequest(id) || isInternalRequest(id)) {
         return null

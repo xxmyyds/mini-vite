@@ -3,11 +3,14 @@ import { Plugin } from '../plugin'
 import { isJSRequest } from '../utils'
 import esbuild from 'esbuild'
 import path from 'path'
+import { blue, green, yellow } from 'picocolors'
 
 export function esbuildTransformPlugin(): Plugin {
   return {
     name: 'm-vite:esbuild-transform',
     async load(id) {
+      // console.log(blue('esbuild load'), id)
+
       if (isJSRequest(id)) {
         try {
           const code = await readFile(id, 'utf-8')
@@ -18,6 +21,8 @@ export function esbuildTransformPlugin(): Plugin {
       }
     },
     async transform(code, id) {
+      // console.log(yellow('esbuild transform'), id)
+
       if (isJSRequest(id)) {
         const extname = path.extname(id).slice(1)
         const { code: transformedCode, map } = await esbuild.transform(code, {

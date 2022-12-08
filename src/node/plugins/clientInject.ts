@@ -3,6 +3,7 @@ import { Plugin } from '../plugin'
 import fs from 'fs-extra'
 import path from 'path'
 import { ServerContext } from '../server/index'
+import { blue, green, yellow } from 'picocolors'
 
 export function clientInjectPlugin(): Plugin {
   let serverContext: ServerContext
@@ -12,12 +13,16 @@ export function clientInjectPlugin(): Plugin {
       serverContext = s
     },
     resolveId(id) {
+      //   console.log(yellow('clientInject resolveId'), id)
+
       if (id === CLIENT_PUBLIC_PATH) {
         return { id }
       }
       return null
     },
     async load(id) {
+      //   console.log(blue('clientInject load'), id)
+
       // 加载 HMR 客户端脚本
       if (id === CLIENT_PUBLIC_PATH) {
         const realPath = path.join(
@@ -35,6 +40,8 @@ export function clientInjectPlugin(): Plugin {
       }
     },
     transformIndexHtml(raw) {
+      //   console.log(green('clientInject transformIndexHtml'))
+
       // 插入客户端脚本
       // 即在 head 标签后面加上 <script type="module" src="/@vite/client"></script>
       // 注: 在 indexHtml 中间件里面会自动执行 transformIndexHtml 钩子
